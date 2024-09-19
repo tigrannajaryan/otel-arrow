@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package otlpdict
+package stef
 
 import (
 	"io"
+	"log"
 
+	"github.com/tigrannajaryan/stef/types"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/dataset"
+	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/stef/otlpconvert"
 
 	"github.com/tigrannajaryan/stef/metrics"
 )
@@ -30,11 +33,13 @@ type MetricsProfileable struct {
 	dataset     dataset.MetricsDataset
 	//metrics     []pmetric.Metrics
 
+	writer *metrics.Writer
+
 	// Next batch to encode. The result goes to nextBatchToSerialize.
 	nextBatchToEncode []pmetric.Metrics
 
 	// Next batch to serialize. The result goes to byte buffers.
-	nextBatchToSerialize []metrics.Records
+	nextBatchToSerialize []*otlpconvert.SortedMetrics
 
 	// Keep all sent traces for verification after delivery.
 	allSentMetrics [][]pmetric.Metrics
@@ -61,6 +66,18 @@ type MetricsProfileable struct {
 
 	// Stores deserialized data that needs to be decoded.
 	rcvMetrics []metrics.Records
+	chunkWrter *chunkWriter
+}
+
+// chunkWriter is a ChunkWriter that accumulates chunks in a memory buffer.
+type chunkWriter struct {
+	chunks [][]byte
+}
+
+func (m *chunkWriter) WriteChunk(header []byte, content []byte) error {
+	all := append(header, content...)
+	m.chunks = append(m.chunks, all)
+	return nil
 }
 
 func NewMetricsProfileable(
@@ -70,7 +87,7 @@ func NewMetricsProfileable(
 }
 
 func (s *MetricsProfileable) Name() string {
-	return "OTLP DICT"
+	return "STEF"
 }
 
 func (s *MetricsProfileable) Tags() []string {
@@ -89,6 +106,18 @@ func (s *MetricsProfileable) CompressionAlgorithm() benchmark.CompressionAlgorit
 
 func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	s.resetCumulativeDicts()
+
+	s.chunkWrter = &chunkWriter{}
+	opts := metrics.WriterOptions{}
+	if _, ok := s.compression.(*benchmark.ZstdCompressionAlgo); ok {
+		opts.Compression = types.CompressionZstd
+	}
+
+	var err error
+	s.writer, err = metrics.NewWriter(s.chunkWrter, opts)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (s *MetricsProfileable) EndProfiling(io.Writer) {}
@@ -123,71 +152,12 @@ func (s *MetricsProfileable) ConvertOtlpToOtlpArrow(_ io.Writer, _, _ int) {
 		s.resetCumulativeDicts()
 	}
 
+	stef := otlpconvert.STEFEncoding{}
+
 	s.nextBatchToSerialize = nil
-	//for _, metricReq := range s.nextBatchToEncode {
-	//	// Make a copy of metricReq. In production implementation this is will be unnecessary
-	//	// but we are forced to do it here since the profiler's source data is in the old OTLP format.
-	//
-	//	// First marshal it to bytes.
-	//	r := pmetricotlp.NewExportRequestFromMetrics(metricReq)
-	//	bytes, err := r.MarshalProto()
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	// Then unmarshal from bytes to OTLP DICT's Protobuf message.
-	//	destMetrics := &otlpdictmetrics.ExportMetricsServiceRequest{}
-	//	err = proto.Unmarshal(bytes, destMetrics)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//
-	//	s.nextBatchToSerialize = append(s.nextBatchToSerialize, destMetrics)
-	//
-	//	// Now do the actual dictionary encoding. This is the part that needs to be benchmarked
-	//	// separately in the future.
-	//	rss := destMetrics.ResourceMetrics
-	//	for i := 0; i < len(rss); i++ {
-	//		rs := rss[i]
-	//
-	//		dictionizeAttrs(s.sKeyDict, s.sValDict, rs.Resource.Attributes)
-	//
-	//		ss := rs.ScopeMetrics
-	//		for j := 0; j < len(ss); j++ {
-	//			sps := ss[j].Metrics
-	//			for k := 0; k < len(sps); k++ {
-	//				metric := sps[k]
-	//				dictionizeStr(s.sMetricNameDict, &metric.Name, &metric.NameRef)
-	//				dictionizeStr(s.sMetricNameDict, &metric.Description, &metric.DescriptionRef)
-	//
-	//				switch v := metric.Data.(type) {
-	//				case *v1.Metric_Sum:
-	//					for _, dp := range v.Sum.DataPoints {
-	//						dictionizeAttrs(s.sKeyDict, s.sValDict, dp.Attributes)
-	//					}
-	//				case *v1.Metric_Gauge:
-	//					for _, dp := range v.Gauge.DataPoints {
-	//						dictionizeAttrs(s.sKeyDict, s.sValDict, dp.Attributes)
-	//					}
-	//				case *v1.Metric_Histogram:
-	//					for _, dp := range v.Histogram.DataPoints {
-	//						dictionizeAttrs(s.sKeyDict, s.sValDict, dp.Attributes)
-	//					}
-	//				case *v1.Metric_ExponentialHistogram:
-	//					for _, dp := range v.ExponentialHistogram.DataPoints {
-	//						dictionizeAttrs(s.sKeyDict, s.sValDict, dp.Attributes)
-	//					}
-	//				default:
-	//					panic("unimplemented metric type")
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//// Include dictionaries in the first request of the batch.
-	//s.nextBatchToSerialize[0].ValDict = dictToProto(s.sValDict)
-	//s.nextBatchToSerialize[0].KeyDict = dictToProto(s.sKeyDict)
-	//s.nextBatchToSerialize[0].MetricNameDict = dictToProto(s.sMetricNameDict)
+	for _, metricReq := range s.nextBatchToEncode {
+		s.nextBatchToSerialize = append(s.nextBatchToSerialize, stef.FromOTLP(metricReq))
+	}
 }
 
 func (s *MetricsProfileable) Process(io.Writer) string {
@@ -196,14 +166,22 @@ func (s *MetricsProfileable) Process(io.Writer) string {
 }
 
 func (s *MetricsProfileable) Serialize(io.Writer) ([][]byte, error) {
+	stef := otlpconvert.STEFEncoding{}
 	buffers := make([][]byte, len(s.nextBatchToSerialize))
-	//for i, t := range s.nextBatchToSerialize {
-	//	bytes, err := proto.Marshal(t)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	buffers[i] = bytes
-	//}
+	for i, sorted := range s.nextBatchToSerialize {
+		err := stef.Encode(sorted, s.writer)
+		if err != nil {
+			return nil, err
+		}
+
+		var bytes []byte
+		for _, chunk := range s.chunkWrter.chunks {
+			bytes = append(bytes, chunk...)
+		}
+		s.chunkWrter.chunks = nil
+
+		buffers[i] = bytes
+	}
 
 	return buffers, nil
 }

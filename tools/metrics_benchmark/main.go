@@ -26,6 +26,7 @@ import (
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/dataset"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/arrow"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/otlp"
+	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/stef"
 	"github.com/open-telemetry/otel-arrow/pkg/otel/arrow_record"
 )
 
@@ -76,7 +77,7 @@ func main() {
 		ds := dataset.NewRealMetricsDataset(inputFiles[i], benchmark.CompressionTypeZstd, *format)
 		profiler.Printf("Dataset '%s' (%s) loaded\n", inputFiles[i], humanize.Bytes(uint64(ds.SizeInBytes())))
 		otlpMetrics := otlp.NewMetricsProfileable(ds, compressionAlgo)
-		//otlpDictMetrics := otlpdict.NewMetricsProfileable(ds, compressionAlgo)
+		stefMetrics := stef.NewMetricsProfileable(ds, compressionAlgo)
 		otlpArrowMetrics := arrow.NewMetricsProfileable([]string{"stream mode"}, ds, conf)
 		otlpArrowMetrics.SetObserver(observer)
 
@@ -84,9 +85,9 @@ func main() {
 			panic(fmt.Errorf("expected no error, got %v", err))
 		}
 
-		//if err := profiler.Profile(otlpDictMetrics, maxIter); err != nil {
-		//	panic(fmt.Errorf("expected no error, got %v", err))
-		//}
+		if err := profiler.Profile(stefMetrics, maxIter); err != nil {
+			panic(fmt.Errorf("expected no error, got %v", err))
+		}
 
 		if err := profiler.Profile(otlpArrowMetrics, maxIter); err != nil {
 			panic(fmt.Errorf("expected no error, got %v", err))
@@ -95,11 +96,11 @@ func main() {
 		// If the unary RPC mode is enabled,
 		// run the OTLP Arrow benchmark in unary RPC mode.
 		if *unaryRpcPtr {
-			//otlpDictMetrics := otlpdict.NewMetricsProfileable(ds, compressionAlgo)
-			//otlpDictMetrics.EnableUnaryRpcMode()
-			//if err := profiler.Profile(otlpDictMetrics, maxIter); err != nil {
-			//	panic(fmt.Errorf("expected no error, got %v", err))
-			//}
+			stefMetrics := stef.NewMetricsProfileable(ds, compressionAlgo)
+			stefMetrics.EnableUnaryRpcMode()
+			if err := profiler.Profile(stefMetrics, maxIter); err != nil {
+				panic(fmt.Errorf("expected no error, got %v", err))
+			}
 
 			otlpArrowMetrics = arrow.NewMetricsProfileable([]string{"unary rpc mode"}, ds, conf)
 			otlpArrowMetrics.EnableUnaryRpcMode()
