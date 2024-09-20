@@ -17,6 +17,7 @@ package dataset
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -133,6 +134,7 @@ func NewRealMetricsDataset(path string, compression string, format string) *Real
 	} else {
 		mdata, bytes = metricsFromProto(path)
 	}
+	fmt.Printf("dataset points: %v\n", mdata.DataPointCount())
 
 	ds := &RealMetricsDataset{
 		metrics:      []metrics{},
@@ -205,6 +207,8 @@ func (d *RealMetricsDataset) Metrics(offset, size int) []pmetric.Metrics {
 			}
 		}
 	}
+
+	//fmt.Printf("datapoints: %v\n", request.DataPointCount())
 
 	return []pmetric.Metrics{request}
 }

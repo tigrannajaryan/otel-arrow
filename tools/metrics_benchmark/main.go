@@ -65,15 +65,17 @@ func main() {
 		conf.Stats = true
 	}
 
-	warmUpIter := uint64(1)
+	warmUpIter := uint64(0)
 	observer := arrow_record.NewConsoleObserver(500, 1)
 
 	// Performance comparison for each input file
 	for i := range inputFiles {
 		// Compare the performance between the standard OTLP representation and the OTLP Arrow representation.
-		profiler := benchmark.NewProfiler([]int{128, 1024, 2048, 4096}, "output/metrics_benchmark.log", warmUpIter)
+		profiler := benchmark.NewProfiler(
+			[]int{128, 1024, 2048, 4096, 1000000}, "output/metrics_benchmark.log", warmUpIter,
+		)
 		compressionAlgo := benchmark.Zstd()
-		maxIter := uint64(3)
+		maxIter := uint64(1)
 		ds := dataset.NewRealMetricsDataset(inputFiles[i], benchmark.CompressionTypeZstd, *format)
 		profiler.Printf("Dataset '%s' (%s) loaded\n", inputFiles[i], humanize.Bytes(uint64(ds.SizeInBytes())))
 		otlpMetrics := otlp.NewMetricsProfileable(ds, compressionAlgo)
