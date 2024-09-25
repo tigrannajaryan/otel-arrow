@@ -5,8 +5,8 @@ import (
 
 	otlpmetrics "go.opentelemetry.io/collector/pdata/pmetric"
 
-	"github.com/tigrannajaryan/stef/anyvalue"
-	"github.com/tigrannajaryan/stef/types"
+	"github.com/tigrannajaryan/stef/stef-go/anyvalue"
+	"github.com/tigrannajaryan/stef/stef-go/types"
 )
 
 type TreeConverter struct {

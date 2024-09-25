@@ -6,8 +6,8 @@ import (
 
 	metricspb "go.opentelemetry.io/collector/pdata/pmetric"
 
-	"github.com/tigrannajaryan/stef/metrics"
-	"github.com/tigrannajaryan/stef/types"
+	"github.com/tigrannajaryan/stef/stef-go/metrics"
+	"github.com/tigrannajaryan/stef/stef-go/types"
 )
 
 type STEFEncoding struct {

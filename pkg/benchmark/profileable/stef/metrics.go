@@ -18,14 +18,14 @@ import (
 	"io"
 	"log"
 
-	"github.com/tigrannajaryan/stef/types"
+	"github.com/tigrannajaryan/stef/stef-go/types"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/dataset"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/stef/otlpconvert"
 
-	"github.com/tigrannajaryan/stef/metrics"
+	"github.com/tigrannajaryan/stef/stef-go/metrics"
 )
 
 type MetricsProfileable struct {

@@ -10,8 +10,8 @@ import (
 	//otlpresource "go.opentelemetry.io/collector/pdata/presource"
 	"modernc.org/b/v2"
 
-	"github.com/tigrannajaryan/stef/anyvalue"
-	"github.com/tigrannajaryan/stef/types"
+	"github.com/tigrannajaryan/stef/stef-go/anyvalue"
+	"github.com/tigrannajaryan/stef/stef-go/types"
 )
 
 type SortedMetrics struct {
