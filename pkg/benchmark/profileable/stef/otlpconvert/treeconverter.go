@@ -111,9 +111,40 @@ func (c *TreeConverter) covertNumberDataPoints(
 		value := values.Append()
 		value.TimestampUnixNano = uint64(dp.Timestamp())
 		value.StartTimestampUnixNano = uint64(dp.StartTimestamp())
+		value.Exemplars = c.exemplarsToExemplars(dp.Exemplars())
 
 		c.numberDataPointToTimedValue(value, dp)
 	}
+}
+
+func (c *TreeConverter) exemplarsToExemplars(exemplars otlpmetrics.ExemplarSlice) []types.Exemplar {
+	ret := make([]types.Exemplar, 0, exemplars.Len())
+	for i := 0; i < exemplars.Len(); i++ {
+		src := exemplars.At(i)
+		MapToSortedAttrs(src.FilteredAttributes(), &c.encoder, &c.tempAttrs)
+		ret = append(
+			ret, types.Exemplar{
+				TimestampUnixNano: uint64(src.Timestamp()),
+				FilteredAttrs:     c.tempAttrs.Clone(),
+				SpanId:            types.AttrValue(src.TraceID().String()),
+				TraceId:           types.AttrValue(src.SpanID().String()),
+			},
+		)
+		dst := &ret[len(ret)-1]
+		switch src.ValueType() {
+		case otlpmetrics.ExemplarValueTypeInt:
+			dst.Int64Val = src.IntValue()
+			dst.ValueType = types.ExemplarValueTypeInt64
+		case otlpmetrics.ExemplarValueTypeDouble:
+			dst.Float64Val = src.DoubleValue()
+			dst.ValueType = types.ExemplarValueTypeFloat64
+		case otlpmetrics.ExemplarValueTypeEmpty:
+			dst.ValueType = types.ExemplarValueTypeEmpty
+		default:
+			panic("unknown exemplar value type")
+		}
+	}
+	return ret
 }
 
 func calcNumericMetricType(metric otlpmetrics.Metric, dp otlpmetrics.NumberDataPoint) types.MetricType {
@@ -173,6 +204,7 @@ func (c *TreeConverter) covertHistogramDataPoints(
 		value := values.Append()
 		value.TimestampUnixNano = uint64(dp.Timestamp())
 		value.StartTimestampUnixNano = uint64(dp.StartTimestamp())
+		value.Exemplars = c.exemplarsToExemplars(dp.Exemplars())
 
 		// Calculate field presence bits and compose Float64Vals
 		value.Float64Vals = []float64{}
