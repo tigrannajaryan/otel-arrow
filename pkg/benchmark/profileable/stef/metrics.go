@@ -19,6 +19,7 @@ import (
 	"log"
 
 	"github.com/tigrannajaryan/stef/stef-go/types"
+	"github.com/tigrannajaryan/stef/stef-otlp/sortedbymetric"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
@@ -39,7 +40,7 @@ type MetricsProfileable struct {
 	nextBatchToEncode []pmetric.Metrics
 
 	// Next batch to serialize. The result goes to byte buffers.
-	nextBatchToSerialize []*otlpconvert.SortedMetrics
+	nextBatchToSerialize []*sortedbymetric.SortedTree
 
 	// Keep all sent traces for verification after delivery.
 	allSentMetrics [][]pmetric.Metrics

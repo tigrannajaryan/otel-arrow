@@ -1,6 +1,6 @@
 module github.com/open-telemetry/otel-arrow
 
-go 1.22.0
+go 1.22.4
 
 toolchain go1.22.6
 
@@ -16,16 +16,16 @@ require (
 	github.com/pierrec/lz4 v2.0.5+incompatible
 	github.com/stretchr/testify v1.9.0
 	github.com/tigrannajaryan/stef/stef-go v0.0.0
+	github.com/tigrannajaryan/stef/stef-otlp v0.0.0
 	github.com/zeebo/assert v1.3.0
 	go.opentelemetry.io/collector/config/configtelemetry v0.108.1
-	go.opentelemetry.io/collector/pdata v1.14.1
+	go.opentelemetry.io/collector/pdata v1.16.0
 	go.opentelemetry.io/otel v1.29.0
 	go.opentelemetry.io/otel/metric v1.29.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	google.golang.org/grpc v1.66.2
 	google.golang.org/protobuf v1.34.2
-	modernc.org/b/v2 v2.1.0
 )
 
 require (
@@ -56,6 +56,9 @@ require (
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	modernc.org/b/v2 v2.1.0 // indirect
 )
 
 replace github.com/tigrannajaryan/stef/stef-go v0.0.0 => ../stef/stef-go
+
+replace github.com/tigrannajaryan/stef/stef-otlp v0.0.0 => ../stef/stef-otlp

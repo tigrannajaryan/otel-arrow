@@ -4,63 +4,29 @@ import (
 	"bytes"
 	"io"
 
+	otlpconvert "github.com/tigrannajaryan/stef/stef-otlp"
+	"github.com/tigrannajaryan/stef/stef-otlp/sortedbymetric"
 	metricspb "go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/tigrannajaryan/stef/stef-go/metrics"
 	"github.com/tigrannajaryan/stef/stef-go/types"
+	_ "github.com/tigrannajaryan/stef/stef-otlp"
 )
 
 type STEFEncoding struct {
 	Opts metrics.WriterOptions
 }
 
-func (d *STEFEncoding) FromOTLP(data metricspb.Metrics) *SortedMetrics {
-	converter := NewTreeConverter()
-	return converter.Otlp2Tree(data.ResourceMetrics())
+func (d *STEFEncoding) FromOTLP(data metricspb.Metrics) *sortedbymetric.SortedTree {
+	converter := otlpconvert.NewOtlpToSortedTree()
+	return converter.FromOtlp(data.ResourceMetrics())
 }
 
-func (d *STEFEncoding) Encode(sorted *SortedMetrics, writer *metrics.Writer) error {
-	sorted.Iter(
-		func(metric *types.Metric, byMetric *ByMetric) error {
-			if err := writer.WriteMetric(metric); err != nil {
-				return err
-			}
-			byMetric.Iter(
-				func(resource *types.Resource, byResource *ByResource) error {
-					if err := writer.WriteResource(resource); err != nil {
-						return err
-					}
-					byResource.Iter(
-						func(scope *types.Scope, byScope *ByScope) error {
-							if err := writer.WriteScope(scope); err != nil {
-								return err
-							}
-							byScope.Iter(
-								func(attrs types.AttrList, values *types.TimedValues) error {
-									if err := writer.StartAttrs(attrs); err != nil {
-										return err
-									}
-									for _, value := range values.Values() {
-										if err := writer.WriteValue(&value); err != nil {
-											return err
-										}
-									}
-
-									//return writer.endAttrs()
-									return nil
-								},
-							)
-							return nil
-						},
-					)
-					return nil
-				},
-			)
-			return nil
-		},
-	)
-	writer.Flush()
-	return nil
+func (d *STEFEncoding) Encode(sorted *sortedbymetric.SortedTree, writer *metrics.Writer) error {
+	if err := sorted.ToStef(writer); err != nil {
+		return err
+	}
+	return writer.Flush()
 }
 
 func (d *STEFEncoding) Decode(b []byte) (any, error) {
