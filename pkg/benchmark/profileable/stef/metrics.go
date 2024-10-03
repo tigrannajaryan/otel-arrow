@@ -15,11 +15,14 @@
 package stef
 
 import (
+	"bytes"
 	"io"
 	"log"
 
 	"github.com/tigrannajaryan/stef/stef-go/types"
+	otlpconvert2 "github.com/tigrannajaryan/stef/stef-otlp"
 	"github.com/tigrannajaryan/stef/stef-otlp/sortedbymetric"
+	"github.com/tigrannajaryan/stef/stef-otlp/sortedbyresource"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
@@ -52,22 +55,16 @@ type MetricsProfileable struct {
 	// Unary or streaming mode.
 	unaryRpcMode bool
 
-	// Sender's dictionaries.
-	//sKeyDict        sendDict
-	//sMetricNameDict sendDict
-	//sValDict        sendDict
-
-	// Receiver's cumulative dictionaries.
-	//rKeyDict        []string
-	//rMetricNameDict []string
-	//rValDict        []string
+	reader             *metrics.Reader
+	byteAndBlockReader byteAndBlockReader
 
 	// A flag to compare sent and received data.
 	verifyDelivery bool
 
 	// Stores deserialized data that needs to be decoded.
-	rcvMetrics []metrics.Records
-	chunkWrter *chunkWriter
+	//rcvMetrics    []metrics.Records
+	chunkWrter    *chunkWriter
+	receivedTrees []*sortedbyresource.SortedTree
 }
 
 // chunkWriter is a ChunkWriter that accumulates chunks in a memory buffer.
@@ -79,6 +76,23 @@ func (m *chunkWriter) WriteChunk(header []byte, content []byte) error {
 	all := append(header, content...)
 	m.chunks = append(m.chunks, all)
 	return nil
+}
+
+type byteAndBlockReader struct {
+	buf bytes.Buffer
+}
+
+func (b *byteAndBlockReader) AddBytes(bytes []byte) error {
+	_, err := b.buf.Write(bytes)
+	return err
+}
+
+func (b *byteAndBlockReader) ReadByte() (byte, error) {
+	return b.buf.ReadByte()
+}
+
+func (b *byteAndBlockReader) Read(p []byte) (n int, err error) {
+	return b.buf.Read(p)
 }
 
 func NewMetricsProfileable(
@@ -116,6 +130,17 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 
 	var err error
 	s.writer, err = metrics.NewWriter(s.chunkWrter, opts)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Copy the header chunk to reader.
+	for _, chunk := range s.chunkWrter.chunks {
+		s.byteAndBlockReader.AddBytes(chunk)
+	}
+	s.chunkWrter.chunks = nil
+
+	s.reader, err = metrics.NewReader(&s.byteAndBlockReader)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -188,6 +213,22 @@ func (s *MetricsProfileable) Serialize(io.Writer) ([][]byte, error) {
 }
 
 func (s *MetricsProfileable) Deserialize(_ io.Writer, buffers [][]byte) {
+	for _, buffer := range buffers {
+		s.byteAndBlockReader.AddBytes(buffer)
+	}
+
+	converter := otlpconvert2.NewStefToSortedTree()
+	tree, err := converter.FromStef(s.reader)
+	if err != nil {
+		panic(err)
+	}
+	s.receivedTrees = append(s.receivedTrees, tree)
+
+	//metrics, err := tree.ToOtlp()
+	//if err != nil {
+	//	panic(err)
+	//}
+
 	//s.rcvMetrics = make([]otlpdictmetrics.ExportMetricsServiceRequest, len(buffers))
 	//
 	//for i, b := range buffers {
@@ -198,6 +239,25 @@ func (s *MetricsProfileable) Deserialize(_ io.Writer, buffers [][]byte) {
 }
 
 func (s *MetricsProfileable) ConvertOtlpArrowToOtlp(_ io.Writer) {
+	metricData := pmetric.NewMetrics()
+	for _, tree := range s.receivedTrees {
+		metrics, err := tree.ToOtlp()
+		if err != nil {
+			panic(err)
+		}
+		metrics.ResourceMetrics().MoveAndAppendTo(metricData.ResourceMetrics())
+	}
+	//metricData.DataPointCount()
+	//	if s.verifyDelivery {
+	//		//sentTraces := s.allSentMetrics[s.rcvMetricIdx]
+	//		//s.rcvMetricIdx++
+	//		//for _, srcTrace := range sentTraces {
+	//		//if !s.equalTraces(srcTrace, s.rcvTraces[i]) {
+	//		//	panic("sent and received traces are not equal")
+	//		//}
+	//		//}
+	//	}
+
 	//for i := 0; i < len(s.rcvMetrics); i++ {
 	//	deserializeDict(s.rcvMetrics[i].ValDict, &s.rValDict)
 	//	deserializeDict(s.rcvMetrics[i].KeyDict, &s.rKeyDict)
@@ -220,6 +280,7 @@ func (s *MetricsProfileable) ConvertOtlpArrowToOtlp(_ io.Writer) {
 
 func (s *MetricsProfileable) Clear() {
 	s.nextBatchToEncode = nil
+	s.receivedTrees = nil
 }
 
 func (s *MetricsProfileable) ShowStats() {}
