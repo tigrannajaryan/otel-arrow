@@ -1146,6 +1146,7 @@ go.opentelemetry.io/collector/otelcol v0.108.1 h1:fp9AplsVClzuF/iKO5LBZjswmybA1p
 go.opentelemetry.io/collector/otelcol v0.108.1/go.mod h1:8QIMB1AsnRJiHBOcLN+jD20rBP8J0dY/7dCAZVP979c=
 go.opentelemetry.io/collector/pdata v1.14.1 h1:wXZjtQA7Vy5HFqco+yA95ENyMQU5heBB1IxMHQf6mUk=
 go.opentelemetry.io/collector/pdata v1.14.1/go.mod h1:z1dTjwwtcoXxZx2/nkHysjxMeaxe9pEmYTEr4SMNIx8=
+go.opentelemetry.io/collector/pdata v1.16.0/go.mod h1:YZZJIt2ehxosYf/Y1pbvexjNWsIGNNrzzlCTO9jC1F4=
 go.opentelemetry.io/collector/pdata/pprofile v0.108.1 h1:/XbunfZ+/jt1+d1p4zM4vZ/AgeaIJsayjYdlN1fV+tk=
 go.opentelemetry.io/collector/pdata/pprofile v0.108.1/go.mod h1:/GvG2WcN9Dajlw4QaIOjgz7N32wSfPL3qxJ0BKOcVPo=
 go.opentelemetry.io/collector/pdata/testdata v0.108.1 h1:TpBDoBMBYvC/Ibswe3Ec2eof8XrRrEec6+tfnTeTSGk=

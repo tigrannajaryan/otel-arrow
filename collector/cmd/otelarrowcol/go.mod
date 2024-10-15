@@ -2,7 +2,7 @@
 
 module github.com/open-telemetry/otel-arrow/collector/cmd/otelarrowcol
 
-go 1.22.0
+go 1.22.4
 
 toolchain go1.22.6
 
@@ -136,7 +136,7 @@ require (
 	go.opentelemetry.io/collector/extension/auth v0.108.1 // indirect
 	go.opentelemetry.io/collector/featuregate v1.14.1 // indirect
 	go.opentelemetry.io/collector/internal/globalgates v0.108.1 // indirect
-	go.opentelemetry.io/collector/pdata v1.14.1 // indirect
+	go.opentelemetry.io/collector/pdata v1.16.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.108.1 // indirect
 	go.opentelemetry.io/collector/pdata/testdata v0.108.1 // indirect
 	go.opentelemetry.io/collector/semconv v0.108.1 // indirect

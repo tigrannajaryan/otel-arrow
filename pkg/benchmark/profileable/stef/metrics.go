@@ -168,12 +168,6 @@ func (s *MetricsProfileable) resetCumulativeDicts() {
 }
 
 func (s *MetricsProfileable) ConvertOtlpToOtlpArrow(_ io.Writer, _, _ int) {
-	// In the standard OTLP exporter the incoming messages are already OTLP messages,
-	// so we don't need to create or convert them.
-	//s.sKeyDict.delta = map[string]uint64{}
-	//s.sValDict.delta = map[string]uint64{}
-	//s.sMetricNameDict.delta = map[string]uint64{}
-
 	if s.unaryRpcMode {
 		s.resetCumulativeDicts()
 	}
@@ -182,7 +176,11 @@ func (s *MetricsProfileable) ConvertOtlpToOtlpArrow(_ io.Writer, _, _ int) {
 
 	s.nextBatchToSerialize = nil
 	for _, metricReq := range s.nextBatchToEncode {
-		s.nextBatchToSerialize = append(s.nextBatchToSerialize, stef.FromOTLP(metricReq))
+		tree, err := stef.FromOTLP(metricReq)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		s.nextBatchToSerialize = append(s.nextBatchToSerialize, tree)
 	}
 }
 

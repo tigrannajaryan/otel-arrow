@@ -1,6 +1,6 @@
 module github.com/open-telemetry/otel-arrow/collector/connector/validationconnector
 
-go 1.22.0
+go 1.22.4
 
 toolchain go1.22.6
 
@@ -10,7 +10,7 @@ require (
 	go.opentelemetry.io/collector/component v0.105.0
 	go.opentelemetry.io/collector/connector v0.105.0
 	go.opentelemetry.io/collector/consumer v0.105.0
-	go.opentelemetry.io/collector/pdata v1.14.1
+	go.opentelemetry.io/collector/pdata v1.16.0
 	go.uber.org/zap v1.27.0
 )
 

@@ -17,7 +17,7 @@ type STEFEncoding struct {
 	Opts metrics.WriterOptions
 }
 
-func (d *STEFEncoding) FromOTLP(data metricspb.Metrics) *sortedbymetric.SortedTree {
+func (d *STEFEncoding) FromOTLP(data metricspb.Metrics) (*sortedbymetric.SortedTree, error) {
 	converter := otlpconvert.NewOtlpToSortedTree()
 	return converter.FromOtlp(data.ResourceMetrics())
 }
