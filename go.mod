@@ -1,8 +1,8 @@
 module github.com/open-telemetry/otel-arrow
 
-go 1.22.4
+go 1.23.2
 
-toolchain go1.22.6
+toolchain go1.23.3
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2
@@ -17,6 +17,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/tigrannajaryan/stef/stef-go v0.0.0
 	github.com/tigrannajaryan/stef/stef-otlp v0.0.0
+	github.com/tigrannajaryan/stef/tef v0.0.0
+	github.com/tigrannajaryan/stef/tef-otlp v0.0.0
 	github.com/zeebo/assert v1.3.0
 	go.opentelemetry.io/collector/config/configtelemetry v0.108.1
 	go.opentelemetry.io/collector/pdata v1.16.0
@@ -63,3 +65,7 @@ require (
 replace github.com/tigrannajaryan/stef/stef-go v0.0.0 => ../stef/stef-go
 
 replace github.com/tigrannajaryan/stef/stef-otlp v0.0.0 => ../stef/stef-otlp
+
+replace github.com/tigrannajaryan/stef/tef v0.0.0 => ../stef/tef
+
+replace github.com/tigrannajaryan/stef/tef-otlp v0.0.0 => ../stef/tef-otlp

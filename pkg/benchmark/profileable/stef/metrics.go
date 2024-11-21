@@ -19,17 +19,17 @@ import (
 	"io"
 	"log"
 
-	"github.com/tigrannajaryan/stef/stef-go/types"
-	otlpconvert2 "github.com/tigrannajaryan/stef/stef-otlp"
-	"github.com/tigrannajaryan/stef/stef-otlp/sortedbymetric"
-	"github.com/tigrannajaryan/stef/stef-otlp/sortedbyresource"
+	otlpconvert2 "github.com/tigrannajaryan/stef/tef-otlp"
+	"github.com/tigrannajaryan/stef/tef-otlp/sortedbymetric"
+	"github.com/tigrannajaryan/stef/tef-otlp/sortedbyresource"
+	"github.com/tigrannajaryan/stef/tef/pkg"
+	"github.com/tigrannajaryan/stef/tef/tefgen/example"
+	"github.com/tigrannajaryan/stef/tef/types"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/dataset"
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark/profileable/stef/otlpconvert"
-
-	"github.com/tigrannajaryan/stef/stef-go/metrics"
 )
 
 type MetricsProfileable struct {
@@ -37,7 +37,7 @@ type MetricsProfileable struct {
 	dataset     dataset.MetricsDataset
 	//metrics     []pmetric.Metrics
 
-	writer *metrics.Writer
+	writer *example.Writer
 
 	// Next batch to encode. The result goes to nextBatchToSerialize.
 	nextBatchToEncode []pmetric.Metrics
@@ -55,7 +55,7 @@ type MetricsProfileable struct {
 	// Unary or streaming mode.
 	unaryRpcMode bool
 
-	reader             *metrics.Reader
+	reader             *example.Reader
 	byteAndBlockReader byteAndBlockReader
 
 	// A flag to compare sent and received data.
@@ -123,13 +123,13 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	s.resetCumulativeDicts()
 
 	s.chunkWrter = &chunkWriter{}
-	opts := metrics.WriterOptions{}
+	opts := pkg.WriterOptions{}
 	if _, ok := s.compression.(*benchmark.ZstdCompressionAlgo); ok {
 		opts.Compression = types.CompressionZstd
 	}
 
 	var err error
-	s.writer, err = metrics.NewWriter(s.chunkWrter, opts)
+	s.writer, err = example.NewWriter(s.chunkWrter, opts)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -140,7 +140,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	}
 	s.chunkWrter.chunks = nil
 
-	s.reader, err = metrics.NewReader(&s.byteAndBlockReader)
+	s.reader, err = example.NewReader(&s.byteAndBlockReader)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -215,8 +215,8 @@ func (s *MetricsProfileable) Deserialize(_ io.Writer, buffers [][]byte) {
 		s.byteAndBlockReader.AddBytes(buffer)
 	}
 
-	converter := otlpconvert2.NewStefToSortedTree()
-	tree, err := converter.FromStef(s.reader)
+	converter := otlpconvert2.NewTefToSortedTree()
+	tree, err := converter.FromTef(s.reader)
 	if err != nil {
 		panic(err)
 	}

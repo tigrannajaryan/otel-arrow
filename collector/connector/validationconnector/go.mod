@@ -1,8 +1,8 @@
 module github.com/open-telemetry/otel-arrow/collector/connector/validationconnector
 
-go 1.22.4
+go 1.23.2
 
-toolchain go1.22.6
+toolchain go1.23.3
 
 require (
 	github.com/open-telemetry/otel-arrow v0.26.0
