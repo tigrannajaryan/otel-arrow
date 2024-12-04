@@ -19,12 +19,12 @@ import (
 	"io"
 	"log"
 
-	otlpconvert2 "github.com/tigrannajaryan/stef/tef-otlp"
-	"github.com/tigrannajaryan/stef/tef-otlp/sortedbymetric"
-	"github.com/tigrannajaryan/stef/tef-otlp/sortedbyresource"
-	"github.com/tigrannajaryan/stef/tef/pkg"
-	"github.com/tigrannajaryan/stef/tef/tefgen/example"
-	"github.com/tigrannajaryan/stef/tef/types"
+	"github.com/tigrannajaryan/stef/tef-go/pkg"
+	"github.com/tigrannajaryan/stef/tef-go/types"
+	"github.com/tigrannajaryan/stef/tef-otel/oteltef"
+	otlpconvert2 "github.com/tigrannajaryan/stef/tef-pdata"
+	"github.com/tigrannajaryan/stef/tef-pdata/sortedbymetric"
+	"github.com/tigrannajaryan/stef/tef-pdata/sortedbyresource"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
@@ -37,7 +37,7 @@ type MetricsProfileable struct {
 	dataset     dataset.MetricsDataset
 	//metrics     []pmetric.Metrics
 
-	writer *example.Writer
+	writer *oteltef.Writer
 
 	// Next batch to encode. The result goes to nextBatchToSerialize.
 	nextBatchToEncode []pmetric.Metrics
@@ -55,7 +55,7 @@ type MetricsProfileable struct {
 	// Unary or streaming mode.
 	unaryRpcMode bool
 
-	reader             *example.Reader
+	reader             *oteltef.Reader
 	byteAndBlockReader byteAndBlockReader
 
 	// A flag to compare sent and received data.
@@ -129,7 +129,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	}
 
 	var err error
-	s.writer, err = example.NewWriter(s.chunkWrter, opts)
+	s.writer, err = oteltef.NewWriter(s.chunkWrter, opts)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -140,7 +140,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	}
 	s.chunkWrter.chunks = nil
 
-	s.reader, err = example.NewReader(&s.byteAndBlockReader)
+	s.reader, err = oteltef.NewReader(&s.byteAndBlockReader)
 	if err != nil {
 		log.Fatalln(err)
 	}

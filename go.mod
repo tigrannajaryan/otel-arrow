@@ -14,11 +14,10 @@ require (
 	github.com/klauspost/compress v1.17.9
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pierrec/lz4 v2.0.5+incompatible
-	github.com/stretchr/testify v1.9.0
-	github.com/tigrannajaryan/stef/stef-go v0.0.0
-	github.com/tigrannajaryan/stef/stef-otlp v0.0.0
-	github.com/tigrannajaryan/stef/tef v0.0.0
-	github.com/tigrannajaryan/stef/tef-otlp v0.0.0
+	github.com/stretchr/testify v1.10.0
+	github.com/tigrannajaryan/stef/tef-go v0.0.0
+	github.com/tigrannajaryan/stef/tef-otel v0.0.0
+	github.com/tigrannajaryan/stef/tef-pdata v0.0.0
 	github.com/zeebo/assert v1.3.0
 	go.opentelemetry.io/collector/config/configtelemetry v0.108.1
 	go.opentelemetry.io/collector/pdata v1.16.0
@@ -26,8 +25,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.29.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
-	google.golang.org/grpc v1.66.2
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.2
 )
 
 require (
@@ -38,7 +37,6 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
@@ -46,26 +44,28 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/tigrannajaryan/stef/stef-go v0.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/b/v2 v2.1.0 // indirect
 )
 
-replace github.com/tigrannajaryan/stef/stef-go v0.0.0 => ../stef/stef-go
-
-replace github.com/tigrannajaryan/stef/stef-otlp v0.0.0 => ../stef/stef-otlp
-
-replace github.com/tigrannajaryan/stef/tef v0.0.0 => ../stef/tef
-
-replace github.com/tigrannajaryan/stef/tef-otlp v0.0.0 => ../stef/tef-otlp
+replace (
+	github.com/tigrannajaryan/stef/stef-go v0.0.0 => ../stef/stef-go
+	github.com/tigrannajaryan/stef/stef-otlp v0.0.0 => ../stef/stef-otlp
+	github.com/tigrannajaryan/stef/tef-go v0.0.0 => ../stef/tef-go
+	github.com/tigrannajaryan/stef/tef-gogrpc v0.0.0 => ../stef/tef-gogrpc
+	github.com/tigrannajaryan/stef/tef-otel v0.0.0 => ../stef/tef-otel
+	github.com/tigrannajaryan/stef/tef-pdata v0.0.0 => ../stef/tef-pdata
+)

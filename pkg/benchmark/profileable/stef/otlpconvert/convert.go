@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/tigrannajaryan/stef/tef-otlp/sortedbymetric"
-	"github.com/tigrannajaryan/stef/tef/pkg"
-	"github.com/tigrannajaryan/stef/tef/tefgen/example"
+	"github.com/tigrannajaryan/stef/tef-go/pkg"
+	"github.com/tigrannajaryan/stef/tef-otel/oteltef"
+	"github.com/tigrannajaryan/stef/tef-pdata/sortedbymetric"
 	metricspb "go.opentelemetry.io/collector/pdata/pmetric"
 
-	otlpconvert "github.com/tigrannajaryan/stef/tef-otlp"
-	"github.com/tigrannajaryan/stef/tef/types"
+	"github.com/tigrannajaryan/stef/tef-go/types"
+	otlpconvert "github.com/tigrannajaryan/stef/tef-pdata"
 )
 
 type STEFEncoding struct {
@@ -22,7 +22,7 @@ func (d *STEFEncoding) FromOTLP(data metricspb.Metrics) (*sortedbymetric.SortedT
 	return converter.FromOtlp(data.ResourceMetrics())
 }
 
-func (d *STEFEncoding) Encode(sorted *sortedbymetric.SortedTree, writer *example.Writer) error {
+func (d *STEFEncoding) Encode(sorted *sortedbymetric.SortedTree, writer *oteltef.Writer) error {
 	if err := sorted.ToTef(writer); err != nil {
 		return err
 	}
@@ -31,13 +31,13 @@ func (d *STEFEncoding) Encode(sorted *sortedbymetric.SortedTree, writer *example
 
 func (d *STEFEncoding) Decode(b []byte) (any, error) {
 	buf := bytes.NewBuffer(b)
-	r, err := example.NewReader(buf)
+	r, err := oteltef.NewReader(buf)
 	if err != nil {
 		return nil, err
 	}
 
 	for {
-		readRecord, err := r.Next()
+		readRecord, err := r.Read()
 		if err == io.EOF {
 			break
 		}
