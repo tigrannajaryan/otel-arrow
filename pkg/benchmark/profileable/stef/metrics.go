@@ -19,12 +19,11 @@ import (
 	"io"
 	"log"
 
-	"github.com/tigrannajaryan/stef/tef-go/pkg"
-	"github.com/tigrannajaryan/stef/tef-go/types"
-	"github.com/tigrannajaryan/stef/tef-otel/oteltef"
-	otlpconvert2 "github.com/tigrannajaryan/stef/tef-pdata"
-	"github.com/tigrannajaryan/stef/tef-pdata/sortedbymetric"
-	"github.com/tigrannajaryan/stef/tef-pdata/sortedbyresource"
+	"github.com/tigrannajaryan/stef/stef-go/pkg"
+	"github.com/tigrannajaryan/stef/stef-otel/oteltef"
+	otlpconvert2 "github.com/tigrannajaryan/stef/stef-pdata"
+	"github.com/tigrannajaryan/stef/stef-pdata/sortedbymetric"
+	"github.com/tigrannajaryan/stef/stef-pdata/sortedbyresource"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
@@ -125,7 +124,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	s.chunkWrter = &chunkWriter{}
 	opts := pkg.WriterOptions{}
 	if _, ok := s.compression.(*benchmark.ZstdCompressionAlgo); ok {
-		opts.Compression = types.CompressionZstd
+		opts.Compression = pkg.CompressionZstd
 	}
 
 	var err error

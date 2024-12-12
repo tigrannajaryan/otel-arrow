@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/tigrannajaryan/stef/tef-go/pkg"
-	"github.com/tigrannajaryan/stef/tef-otel/oteltef"
-	"github.com/tigrannajaryan/stef/tef-pdata/sortedbymetric"
+	"github.com/tigrannajaryan/stef/stef-go/pkg"
+	"github.com/tigrannajaryan/stef/stef-otel/oteltef"
+	"github.com/tigrannajaryan/stef/stef-pdata/sortedbymetric"
 	metricspb "go.opentelemetry.io/collector/pdata/pmetric"
 
-	"github.com/tigrannajaryan/stef/tef-go/types"
-	otlpconvert "github.com/tigrannajaryan/stef/tef-pdata"
+	otlpconvert "github.com/tigrannajaryan/stef/stef-pdata"
 )
 
 type STEFEncoding struct {
@@ -54,7 +53,7 @@ func (d *STEFEncoding) Decode(b []byte) (any, error) {
 
 func (e *STEFEncoding) Name() string {
 	str := "STEF"
-	if e.Opts.Compression != types.CompressionNone {
+	if e.Opts.Compression != pkg.CompressionNone {
 		str += "Z"
 	}
 	return str

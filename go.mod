@@ -15,9 +15,9 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pierrec/lz4 v2.0.5+incompatible
 	github.com/stretchr/testify v1.10.0
-	github.com/tigrannajaryan/stef/tef-go v0.0.0
-	github.com/tigrannajaryan/stef/tef-otel v0.0.0
-	github.com/tigrannajaryan/stef/tef-pdata v0.0.0
+	github.com/tigrannajaryan/stef/stef-go v0.0.0
+	github.com/tigrannajaryan/stef/stef-otel v0.0.0
+	github.com/tigrannajaryan/stef/stef-pdata v0.0.0
 	github.com/zeebo/assert v1.3.0
 	go.opentelemetry.io/collector/config/configtelemetry v0.108.1
 	go.opentelemetry.io/collector/pdata v1.16.0
@@ -44,7 +44,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/tigrannajaryan/stef/stef-go v0.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
@@ -63,9 +62,7 @@ require (
 
 replace (
 	github.com/tigrannajaryan/stef/stef-go v0.0.0 => ../stef/stef-go
-	github.com/tigrannajaryan/stef/stef-otlp v0.0.0 => ../stef/stef-otlp
-	github.com/tigrannajaryan/stef/tef-go v0.0.0 => ../stef/tef-go
-	github.com/tigrannajaryan/stef/tef-gogrpc v0.0.0 => ../stef/tef-gogrpc
-	github.com/tigrannajaryan/stef/tef-otel v0.0.0 => ../stef/tef-otel
-	github.com/tigrannajaryan/stef/tef-pdata v0.0.0 => ../stef/tef-pdata
+	github.com/tigrannajaryan/stef/stef-otel v0.0.0 => ../stef/stef-otel
+	github.com/tigrannajaryan/stef/stef-pdata v0.0.0 => ../stef/stef-pdata
+	github.com/tigrannajaryan/stef/stef-gogrpc v0.0.0 => ../stef/stef-gogrpc
 )

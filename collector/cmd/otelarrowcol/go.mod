@@ -34,7 +34,7 @@ require (
 	go.opentelemetry.io/collector/processor v0.108.1
 	go.opentelemetry.io/collector/receiver v0.108.1
 	go.opentelemetry.io/collector/receiver/otlpreceiver v0.108.1
-	golang.org/x/sys v0.24.0
+	golang.org/x/sys v0.25.0
 )
 
 require (
@@ -105,7 +105,7 @@ require (
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tg123/go-htpasswd v1.2.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
@@ -164,19 +164,19 @@ require (
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	gonum.org/v1/gonum v0.15.1 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240701130421-f6361c86f094 // indirect
-	google.golang.org/grpc v1.66.2 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/grpc v1.68.0 // indirect
+	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
