@@ -23,7 +23,6 @@ import (
 	"github.com/tigrannajaryan/stef/stef-otel/oteltef"
 	otlpconvert2 "github.com/tigrannajaryan/stef/stef-pdata"
 	"github.com/tigrannajaryan/stef/stef-pdata/sortedbymetric"
-	"github.com/tigrannajaryan/stef/stef-pdata/sortedbyresource"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"
@@ -36,7 +35,7 @@ type MetricsProfileable struct {
 	dataset     dataset.MetricsDataset
 	//metrics     []pmetric.Metrics
 
-	writer *oteltef.Writer
+	writer *oteltef.MetricsWriter
 
 	// Next batch to encode. The result goes to nextBatchToSerialize.
 	nextBatchToEncode []pmetric.Metrics
@@ -54,7 +53,7 @@ type MetricsProfileable struct {
 	// Unary or streaming mode.
 	unaryRpcMode bool
 
-	reader             *oteltef.Reader
+	reader             *oteltef.MetricsReader
 	byteAndBlockReader byteAndBlockReader
 
 	// A flag to compare sent and received data.
@@ -62,8 +61,8 @@ type MetricsProfileable struct {
 
 	// Stores deserialized data that needs to be decoded.
 	//rcvMetrics    []metrics.Records
-	chunkWrter    *chunkWriter
-	receivedTrees []*sortedbyresource.SortedTree
+	chunkWrter      *chunkWriter
+	receivedMetrics []pmetric.Metrics
 }
 
 // chunkWriter is a ChunkWriter that accumulates chunks in a memory buffer.
@@ -128,7 +127,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	}
 
 	var err error
-	s.writer, err = oteltef.NewWriter(s.chunkWrter, opts)
+	s.writer, err = oteltef.NewMetricsWriter(s.chunkWrter, opts)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -139,7 +138,7 @@ func (s *MetricsProfileable) StartProfiling(io.Writer) {
 	}
 	s.chunkWrter.chunks = nil
 
-	s.reader, err = oteltef.NewReader(&s.byteAndBlockReader)
+	s.reader, err = oteltef.NewMetricsReader(&s.byteAndBlockReader)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -214,12 +213,12 @@ func (s *MetricsProfileable) Deserialize(_ io.Writer, buffers [][]byte) {
 		s.byteAndBlockReader.AddBytes(buffer)
 	}
 
-	converter := otlpconvert2.NewTefToSortedTree()
-	tree, err := converter.FromTef(s.reader)
+	converter := otlpconvert2.TEFToOTLPUnsorted{}
+	metrics, err := converter.Convert(s.reader)
 	if err != nil {
 		panic(err)
 	}
-	s.receivedTrees = append(s.receivedTrees, tree)
+	s.receivedMetrics = append(s.receivedMetrics, metrics)
 
 	//metrics, err := tree.ToOtlp()
 	//if err != nil {
@@ -237,11 +236,7 @@ func (s *MetricsProfileable) Deserialize(_ io.Writer, buffers [][]byte) {
 
 func (s *MetricsProfileable) ConvertOtlpArrowToOtlp(_ io.Writer) {
 	metricData := pmetric.NewMetrics()
-	for _, tree := range s.receivedTrees {
-		metrics, err := tree.ToOtlp()
-		if err != nil {
-			panic(err)
-		}
+	for _, metrics := range s.receivedMetrics {
 		metrics.ResourceMetrics().MoveAndAppendTo(metricData.ResourceMetrics())
 	}
 	//metricData.DataPointCount()
@@ -277,7 +272,7 @@ func (s *MetricsProfileable) ConvertOtlpArrowToOtlp(_ io.Writer) {
 
 func (s *MetricsProfileable) Clear() {
 	s.nextBatchToEncode = nil
-	s.receivedTrees = nil
+	s.receivedMetrics = nil
 }
 
 func (s *MetricsProfileable) ShowStats() {}
