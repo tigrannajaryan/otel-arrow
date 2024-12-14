@@ -21,8 +21,8 @@ import (
 
 	"github.com/tigrannajaryan/stef/stef-go/pkg"
 	"github.com/tigrannajaryan/stef/stef-otel/oteltef"
-	otlpconvert2 "github.com/tigrannajaryan/stef/stef-pdata"
-	"github.com/tigrannajaryan/stef/stef-pdata/sortedbymetric"
+	otlpconvert2 "github.com/tigrannajaryan/stef/stef-pdata/metrics"
+	"github.com/tigrannajaryan/stef/stef-pdata/metrics/sortedbymetric"
 	"go.opentelemetry.io/collector/pdata/pmetric"
 
 	"github.com/open-telemetry/otel-arrow/pkg/benchmark"

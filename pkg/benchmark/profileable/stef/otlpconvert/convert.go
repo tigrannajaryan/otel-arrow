@@ -6,10 +6,10 @@ import (
 
 	"github.com/tigrannajaryan/stef/stef-go/pkg"
 	"github.com/tigrannajaryan/stef/stef-otel/oteltef"
-	"github.com/tigrannajaryan/stef/stef-pdata/sortedbymetric"
+	"github.com/tigrannajaryan/stef/stef-pdata/metrics/sortedbymetric"
 	metricspb "go.opentelemetry.io/collector/pdata/pmetric"
 
-	otlpconvert "github.com/tigrannajaryan/stef/stef-pdata"
+	otlpconvert "github.com/tigrannajaryan/stef/stef-pdata/metrics"
 )
 
 type STEFEncoding struct {
